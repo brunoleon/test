@@ -3,12 +3,19 @@
 Check version at http://release-monitoring.org against ours
 in OBS.
 """
-import time
+import logging
 import requests
 import yaml
+import subprocess
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+logger.addHandler(ch)
 
 # Anitya URL to use
 SERVER_URL = "https://release-monitoring.org/"
+OBS_URL = "https://api.opensuse.org"
 # Number of items to request per page
 # Let's use maximum page size, so we don't do too much requests
 ITEMS_PER_PAGE = 250
@@ -16,15 +23,48 @@ CONFIG = "projects.yaml"
 
 def main():
     with open(CONFIG) as file:
-        # The FullLoader parameter handles the conversion from YAML
-        # scalar values to Python the dictionary format
         config = yaml.load(file, Loader=yaml.FullLoader)
 
     projects = {}
     for k, v in config["projects"].items():
+        logger.info(f'Processing project: {k}')
         projects[k] = Project(k, v['id'])
         print(projects[k].get_versions())
 
+
+    c = Container("release_monitoring")
+    c.create()
+    for project in projects.keys():
+        c.get_version(project)
+    c.delete()
+
+class Container:
+    def __init__(self, name) -> None:
+        self.name = name
+
+    def create(self):
+        subprocess.run(
+            ["docker", "run", "--rm", "--name", self.name, "-d",
+            "opensuse/leap", "sleep", "60"])
+        self.run("refresh")
+
+    def delete(self):
+        subprocess.run(["docker", "rm", "-f", self.name])
+        self.run("refresh")
+
+    def run(self, cmd):
+        subprocess.run(
+            ["docker", "exec", self.name, cmd],
+            capture_output=True)
+
+    def get_version(self, pkg):
+        v = subprocess.run(
+            ["docker", "exec", self.name, "zypper", "-q", "info", pkg],
+            capture_output=True)
+        res = v.stdout.decode().split('\n')
+        version = [x for x in res if x.startswith("Version")][0].split(':')[-1].strip()
+        print(version)
+        return version
 
 class Project:
     def __init__(self, name, id=None) -> None:
@@ -58,6 +98,7 @@ class Project:
         """
         Get a project version in Suse OBS
         """
+        #https://api.opensuse.org/build/openSUSE:Factory/standard/x86_64/helm
         pass
 
 

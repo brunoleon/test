@@ -1,5 +1,9 @@
 projects:
   helm:
     id: null
-  kubernetes:
+    distribution:
+      - Fedora
+  buildah:
     id: null
+    distribution:
+      - Fedora
