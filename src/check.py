@@ -30,7 +30,8 @@ def main():
     for k, v in config["projects"].items():
         logger.info(f'Processing project: {k}')
         projects[k] = Project(k, v['id'])
-        projects[k].get_versions()
+        if projects[k].get_versions_rm() is None:
+            projects[k].get_versions_lv()
 
     c = Container("release_monitoring")
     c.create()
@@ -42,7 +43,7 @@ def main():
     for project in projects.keys():
         data = {
             'package': project,
-            'upstream': projects['bmake'].version['latest_version'],
+            'upstream': projects[project].version,
             'suse': projects[project].suse_version
             }
         mylist.append(data)
@@ -81,7 +82,6 @@ class Container:
         except:
             logger.error(f"Unable to parse zypper output: {res}")
             version = None
-        print(version)
         return version
 
 class Project:
@@ -107,15 +107,23 @@ class Project:
             result = q["items"][0]["id"]
         return result
 
-    def get_versions(self):
+    def get_versions_rm(self):
         if self.version is not None:
             return self.version
         params = {
             "project_id": self.id
         }
         q = self.query_get("api/v2/versions", params)
-        self.version = q
-        return q
+        if q is not None:
+            self.version = q['latest_version']
+        return self.version
+
+    def get_versions_lv(self):
+        if self.version is not None:
+            return self.version
+        v = subprocess.run(["lastversion", self.name], capture_output=True)
+        self.version = v.stdout.decode().strip()
+        return self.version
 
     def get_version_obs(self):
         """
