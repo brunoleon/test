@@ -1,9 +1,137 @@
 projects:
-  helm:
+  bmake:
     id: null
     distribution:
       - Fedora
   buildah:
+    id: null
+    distribution:
+      - Fedora
+  conmon:
+    id: null
+    distribution:
+      - Fedora
+  distribution:
+    id: null
+    distribution:
+      - Fedora
+  containerized-data-importer:
+    id: null
+    distribution:
+      - Fedora
+  kubevirt:
+    id: null
+    distribution:
+      - Fedora
+  libseccomp:
+    id: null
+    distribution:
+      - Fedora
+  podman:
+    id: null
+    distribution:
+      - Fedora
+  sle-module-containers-release:
+    id: null
+    distribution:
+      - Fedora
+  kubernetes1.23:
+    id: null
+    distribution:
+      - Fedora
+  python-arrow:
+    id: null
+    distribution:
+      - Fedora
+  python-cassandra-driver:
+    id: null
+    distribution:
+      - Fedora
+  python-geomet:
+    id: null
+    distribution:
+      - Fedora
+  kubernetes1.18:
+    id: null
+    distribution:
+      - Fedora
+  libnvidia-container:
+    id: null
+    distribution:
+      - Fedora
+  nvidia-container-runtime:
+    id: null
+    distribution:
+      - Fedora
+  nvidia-container-toolkit:
+    id: null
+    distribution:
+      - Fedora
+  obs-service-docker_label_helper:
+    id: null
+    distribution:
+      - Fedora
+  cni:
+    id: null
+    distribution:
+      - Fedora
+  cni-plugins:
+    id: null
+    distribution:
+      - Fedora
+  fuse-overlayfs:
+    id: null
+    distribution:
+      - Fedora
+  python-kubernetes:
+    id: null
+    distribution:
+      - Fedora
+  slirp4netns:
+    id: null
+    distribution:
+      - Fedora
+  catatonit:
+    id: null
+    distribution:
+      - Fedora
+  container-diff:
+    id: null
+    distribution:
+      - Fedora
+  container-suseconnect:
+    id: null
+    distribution:
+      - Fedora
+  containerd:
+    id: null
+    distribution:
+      - Fedora
+  docker:
+    id: null
+    distribution:
+      - Fedora
+  golang-github-docker-libnetwork:
+    id: null
+    distribution:
+      - Fedora
+  docker-runc:
+    id: null
+    distribution:
+      - Fedora
+  helm:
+    id: null
+    distribution:
+      - Fedora
+  helm-mirror:
+    id: null
+    distribution:
+      - Fedora
+  runc:
+    id: null
+    distribution:
+      - Fedora
+  zypper-docker:
     id: null
     distribution:
       - Fedora
