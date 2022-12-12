@@ -9,3 +9,5 @@ Requirements:
 
 Usage:
 `poetry run src/check.py`
+
+Only stable version of packages are selected by default.
