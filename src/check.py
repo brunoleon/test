@@ -8,6 +8,8 @@ import requests
 import yaml
 import subprocess
 import csv
+import shutil
+import sys
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -23,6 +25,11 @@ ITEMS_PER_PAGE = 250
 CONFIG = "projects.yaml"
 
 def main():
+    c = Container("release_monitoring")
+    if c.engine is None:
+        logger.error('You need either podman/docker installed')
+        sys.exit(1)
+
     with open(CONFIG) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -57,24 +64,33 @@ def main():
 class Container:
     def __init__(self, name) -> None:
         self.name = name
+        self.engine = self.get_container_engine()
+
+    def get_container_engine(self):
+        for engine in ['podman', 'docker']:
+            if shutil.which(engine) is not None:
+                logger.info(f'Using {engine} as container engine')
+                return engine
+        else:
+            return None
 
     def create(self):
         subprocess.run(
-            ["docker", "run", "--rm", "--name", self.name, "-d",
+            [self.engine, "run", "--rm", "--name", self.name, "-d",
             "opensuse/leap", "sleep", "1800"])
         self.exec("refresh")
 
     def delete(self):
-        subprocess.run(["docker", "rm", "-f", self.name])
+        subprocess.run([self.engine, "rm", "-f", self.name])
 
     def exec(self, cmd):
         subprocess.run(
-            ["docker", "exec", self.name, cmd],
+            [self.engine, "exec", self.name, cmd],
             capture_output=True)
 
     def get_version(self, pkg):
         v = subprocess.run(
-            ["docker", "exec", self.name, "zypper", "-q", "info", pkg],
+            [self.engine, "exec", self.name, "zypper", "-q", "info", pkg],
             capture_output=True)
         res = v.stdout.decode().split('\n')
         try:
