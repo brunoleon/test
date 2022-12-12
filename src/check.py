@@ -36,11 +36,10 @@ def main():
     projects = {}
     for k, v in config["projects"].items():
         logger.info(f'Processing project: {k}')
-        projects[k] = Project(k, v['id'])
+        projects[k] = Project(k, v)
         if projects[k].get_versions_rm() is None:
             projects[k].get_versions_lv()
 
-    c = Container("release_monitoring")
     c.create()
     for project in projects.keys():
         projects[project].suse_version = c.get_version(project)
@@ -101,22 +100,24 @@ class Container:
         return version
 
 class Project:
-    def __init__(self, name, id=None) -> None:
+    def __init__(self, name, metadata) -> None:
         self.name = name
+        if 'real_name' in metadata:
+            self.real_name = metadata['real_name']
+        else:
+            self.real_name = name
+        self.id = self.get_project_id()
         self.version = None
         self.suse_version = None
-        if id is None:
-            self.id = self.get_project_id(self.name)
-        else:
-            self.id = id
 
-    def get_project_id(self, name):
+
+    def get_project_id(self):
         """
         Get project id from name.
         """
         result = None
         params = {
-            "name": name
+            "name": self.real_name
         }
         q = self.query_get("api/v2/projects", params)
         if q["items"]:
@@ -155,8 +156,6 @@ class Project:
         """
         pass
 
-
-
     def query_get(self, path, params):
         result = None
         resp = requests.get(SERVER_URL + path, params=params)
@@ -165,7 +164,6 @@ class Project:
         else:
             logger.error("ERROR: Wrong arguments for request '{}'".format(resp.url))
         return result
-
 
 if __name__ == "__main__":
     main()
