@@ -22,7 +22,7 @@ OBS_URL = "https://api.opensuse.org"
 # Number of items to request per page
 # Let's use maximum page size, so we don't do too much requests
 ITEMS_PER_PAGE = 250
-CONFIG = "projects.yaml"
+CONFIG = "config.yaml"
 
 def main():
     c = Container("release_monitoring")
