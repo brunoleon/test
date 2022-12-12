@@ -131,7 +131,7 @@ class Project:
         }
         q = self.query_get("api/v2/versions", params)
         if q is not None:
-            self.version = q['latest_version']
+            self.version = q['stable_versions'][0]
         return self.version
 
     def get_versions_lv(self):
