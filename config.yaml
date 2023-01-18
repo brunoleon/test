@@ -48,6 +48,7 @@ projects:
     distribution:
       - Fedora
   python-geomet:
+    real_name: geomet
     id: null
     distribution:
       - Fedora

@@ -66,6 +66,7 @@ class Container:
         self.engine = self.get_container_engine()
 
     def get_container_engine(self):
+        """Check if we are running podman or docker"""
         for engine in ['podman', 'docker']:
             if shutil.which(engine) is not None:
                 logger.info(f'Using {engine} as container engine')
@@ -88,6 +89,7 @@ class Container:
             capture_output=True)
 
     def get_version(self, pkg):
+        """Get the package version available on this container"""
         v = subprocess.run(
             [self.engine, "exec", self.name, "zypper", "-q", "info", pkg],
             capture_output=True)
@@ -112,9 +114,7 @@ class Project:
 
 
     def get_project_id(self):
-        """
-        Get project id from name.
-        """
+        """Get project id from name"""
         result = None
         params = {
             "name": self.real_name
@@ -125,6 +125,7 @@ class Project:
         return result
 
     def get_versions_rm(self):
+        """Get package version from anitya"""
         if self.version is not None:
             return self.version
         params = {
@@ -136,6 +137,7 @@ class Project:
         return self.version
 
     def get_versions_lv(self):
+        """Get package version using 'lastversion' tool"""
         if self.version is not None:
             return self.version
         v = subprocess.run(["lastversion", self.name], capture_output=True)
