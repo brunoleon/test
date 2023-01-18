@@ -1,0 +1,14 @@
+default:
+  image: brunoleon/base_release-monitoring:0.0.1
+
+before_script:
+  - poetry install --no-root
+  - source `poetry env info --path`/bin/activate
+
+stages:
+  - execute
+
+testing:
+  stage: execute
+  script:
+    - poetry run src/check.py
