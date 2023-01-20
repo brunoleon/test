@@ -10,6 +10,7 @@ import subprocess
 import csv
 import shutil
 import sys
+import time
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -39,6 +40,7 @@ def main():
         projects[k] = Project(k, v)
         if projects[k].get_versions_rm() is None:
             projects[k].get_versions_lv()
+        time.sleep(1)
 
     c.create()
     for project in projects.keys():
