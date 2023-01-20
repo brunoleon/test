@@ -11,6 +11,7 @@ import csv
 import shutil
 import sys
 import time
+import re
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -108,8 +109,14 @@ class Project:
         self.name = name
         if 'real_name' in metadata:
             self.real_name = metadata['real_name']
+            self.branch = name.split(self.real_name)[-1]
         else:
             self.real_name = name
+            self.branch = None
+        if 'suse_name' in metadata:
+            self.suse_name = metadata['suse_name']
+        else:
+            self.suse_name = name
         self.id = self.get_project_id()
         self.version = None
         self.suse_version = None
@@ -135,6 +142,10 @@ class Project:
         }
         q = self.query_get("api/v2/versions", params)
         if q is not None:
+            if self.branch:
+                n = [i for i in q['stable_versions'] if re.match(self.branch, i)]
+                self.version = n[0]
+            else:
             self.version = q['stable_versions'][0]
         return self.version
 
