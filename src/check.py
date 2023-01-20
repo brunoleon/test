@@ -25,16 +25,50 @@ OBS_URL = "https://api.opensuse.org"
 # Let's use maximum page size, so we don't do too much requests
 ITEMS_PER_PAGE = 250
 CONFIG = "config.yaml"
+IMAGES = ['opensuse/leap:15.4', 'registry.suse.com/bci/bci-base:15.4']
 
 def main():
-    c = Container("release_monitoring")
-    if c.engine is None:
+    if get_container_engine() is None:
         logger.error('You need either podman/docker installed')
         sys.exit(1)
 
     with open(CONFIG) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
+    projects = gen_projects(config)
+    get_suse_versions(projects)
+    build_report(projects)
+
+
+def build_report(projects):
+    mylist = []
+    for project in projects.keys():
+        data = {
+            'package': project,
+            'upstream': projects[project].version
+        }
+        for os in projects[project].suse_versions:
+            data[os] = projects[project].suse_versions[os]
+        mylist.append(data)
+
+    with open('report.csv', 'w') as f:
+        writer = csv.DictWriter(f, fieldnames=list(data.keys()))
+        writer.writeheader()
+        writer.writerows(mylist)
+
+
+def get_suse_versions(projects):
+    for image in IMAGES:
+        logger.info(f'Launching {image} based container')
+        c = Container("release_monitoring", image)
+        c.create()
+        for project in projects.keys():
+            os = image.split('/')[-1]
+            projects[project].suse_versions[os] = c.get_version(
+                projects[project].suse_name)
+        c.delete()
+
+def gen_projects(config):
     projects = {}
     for k, v in config["projects"].items():
         logger.info(f'Processing project: {k}')
@@ -42,45 +76,28 @@ def main():
         if projects[k].get_versions_rm() is None:
             projects[k].get_versions_lv()
         time.sleep(1)
+    return projects
 
-    c.create()
-    for project in projects.keys():
-        projects[project].suse_version = c.get_version(project)
-    c.delete()
-
-    mylist = []
-    for project in projects.keys():
-        data = {
-            'package': project,
-            'upstream': projects[project].version,
-            'suse': projects[project].suse_version
-            }
-        mylist.append(data)
-
-    with open('report.csv', 'w') as f:
-        writer = csv.DictWriter(f, fieldnames=["package", "upstream", "suse"])
-        writer.writeheader()
-        writer.writerows(mylist)
+def get_container_engine():
+    """Check if we are running podman or docker"""
+    for engine in ['podman', 'docker']:
+        if shutil.which(engine) is not None:
+            logger.info(f'Using {engine} as container engine')
+            return engine
+    else:
+        return None
 
 
 class Container:
-    def __init__(self, name) -> None:
+    def __init__(self, name, image) -> None:
         self.name = name
-        self.engine = self.get_container_engine()
-
-    def get_container_engine(self):
-        """Check if we are running podman or docker"""
-        for engine in ['podman', 'docker']:
-            if shutil.which(engine) is not None:
-                logger.info(f'Using {engine} as container engine')
-                return engine
-        else:
-            return None
+        self.engine = get_container_engine()
+        self.image = image
 
     def create(self):
         subprocess.run(
             [self.engine, "run", "--rm", "--name", self.name, "-d",
-            "opensuse/leap", "sleep", "1800"])
+            self.image, "sleep", "1800"])
         self.exec("refresh")
 
     def delete(self):
@@ -119,7 +136,7 @@ class Project:
             self.suse_name = name
         self.id = self.get_project_id()
         self.version = None
-        self.suse_version = None
+        self.suse_versions = {}
 
 
     def get_project_id(self):
@@ -146,7 +163,7 @@ class Project:
                 n = [i for i in q['stable_versions'] if re.match(self.branch, i)]
                 self.version = n[0]
             else:
-            self.version = q['stable_versions'][0]
+                self.version = q['stable_versions'][0]
         return self.version
 
     def get_versions_lv(self):

@@ -35,10 +35,6 @@ projects:
     id: null
     distribution:
       - Fedora
-  kubernetes1.23:
-    id: null
-    distribution:
-      - Fedora
   python-arrow:
     id: null
     distribution:
@@ -51,9 +47,17 @@ projects:
     real_name: geomet
     id: null
     distribution:
-      - Fedora
+      - Fedora.
   kubernetes1.18:
     id: null
+    real_name: kubernetes
+    suse_name: kubernetes1.18-client
+    distribution:
+      - Fedora
+  kubernetes1.23:
+    id: null
+    real_name: kubernetes
+    suse_name: kubernetes1.23-client
     distribution:
       - Fedora
   libnvidia-container:
