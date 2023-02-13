@@ -25,7 +25,9 @@ OBS_URL = "https://api.opensuse.org"
 # Let's use maximum page size, so we don't do too much requests
 ITEMS_PER_PAGE = 250
 CONFIG = "config.yaml"
-IMAGES = ['opensuse/leap:15.4', 'registry.suse.com/bci/bci-base:15.4']
+IMAGES = ['opensuse/leap:15.4', 'registry.suse.com/bci/bci-base:15.4',
+          'registry.suse.com/bci/bci-base:15.3']
+
 
 def main():
     if get_container_engine() is None:
