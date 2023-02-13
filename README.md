@@ -10,4 +10,5 @@ Requirements:
 Usage:
 `poetry run src/check.py`
 
-Only stable version of packages are selected by default.
+An install script `install.sh` is provided that will schedule a weekly run of the script `report.sh`.
+That script will push back the report to the repository in a report branch.
