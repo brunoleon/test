@@ -80,7 +80,7 @@ def main() -> None:
         sys.exit(1)
 
     with open(CONFIG) as file:
-        config = yaml.load(file, Loader=yaml.FullLoader)
+        config: Config = yaml.safe_load(file)
 
     projects = gen_projects(config)
     get_suse_versions(projects)
