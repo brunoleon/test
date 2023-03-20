@@ -203,7 +203,8 @@ class Project:
 
     def get_versions_rm(self) -> str | None:
         """Get package version from anitya"""
-        if self.version is not None:
+        # if we don't have an id, then we cannot query anitya for the version
+        if self.version is not None or self.id is None:
             return self.version
 
         params: VersionsParams = {
