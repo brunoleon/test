@@ -252,7 +252,7 @@ class Project:
         if resp.status_code == 200:
             result = resp.json()
         else:
-            logger.error("ERROR: Wrong arguments for request '{}'".format(resp.url))
+            logger.error("ERROR: Wrong arguments for request %s, got status %s", resp.url, resp.status_code)
         return result
 
 if __name__ == "__main__":
