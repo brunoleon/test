@@ -6,7 +6,7 @@ distribution,2.8.1,2.8.1-150400.9.11.1,,
 containerized-data-importer,1.56.0,1.51.0-150400.4.7.1,,
 kubevirt,0.59.0,0.54.0-150400.3.7.1,,
 libseccomp,2.5.4,,,
-podman,4.4.2,4.3.1-150400.4.11.1,4.3.1-150400.4.11.1,4.3.1-150300.9.15.1
+podman,4.4.3,4.3.1-150400.4.11.1,4.3.1-150400.4.11.1,4.3.1-150300.9.15.1
 sle-module-containers-release,,,,
 python-arrow,0.8.0,,,
 python-cassandra-driver,3.11.0,,,
